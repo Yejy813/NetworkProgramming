@@ -14,7 +14,7 @@ int main(int argc, char* argv[])
 {
     int sock;
     char message[BUF_SIZE];
-    int str_len;
+    int str_len, recv_len, recv_cnt;
     struct sockaddr_in serv_addr;
 
     if(argc != 3)
@@ -53,15 +53,23 @@ int main(int argc, char* argv[])
             break;
         }
 
-        // 调用完 write，然后立即调用 read，有可能只读取到部分数据
-        // 服务器调用 1 次 write 函数传输数据，如果数据太大，操作系统就有可能把数据
-        // 分成多个数据包发送到客户端。另外在此过程中，客户端有可能在尚未收到全部数据
-        // 时就调用 read 函数， ch5 中有优化代码，这里没有发生错误是因为数据量小，且在
-        // 同一台设备或者相邻设备运行
-        write(sock, message, strlen(message));
-        str_len = read(sock, message, BUF_SIZE - 1);
+        str_len = write(sock, message, strlen(message));
 
-        message[str_len] = 0;
+        recv_len = 0;
+
+        // 多次 read，直到读取的数据大小和发送的数据大小一致     
+        while(str_len < recv_len)
+        {
+            recv_cnt = read(sock, &message[recv_len], BUF_SIZE - 1);
+            if(recv_cnt == -1)
+            {
+                error_handling("read() error!");
+            }
+
+            recv_len += recv_cnt;
+        }
+
+        message[recv_len] = 0;
         printf("Message from server: %s", message);
     }
 
