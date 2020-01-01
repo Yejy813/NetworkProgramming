@@ -70,7 +70,7 @@ int main(int argc, char* argv[])
         }
 
         message[recv_len] = 0;
-        printf("Message from server: %s", message);
+        printf("Message from server: %s \n", message);
     }
 
     close(sock);
