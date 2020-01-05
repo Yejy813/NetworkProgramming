@@ -60,7 +60,7 @@ int main(int argc, char* argv[])
         cpy_reads = reads;
         timeout.tv_sec = 5;
         timeout.tv_usec = 5000;
-
+        
         if((fd_num = select(fd_max + 1, &cpy_reads, 0, 0, &timeout)) == -1)
         {
             break;
@@ -74,7 +74,7 @@ int main(int argc, char* argv[])
 
         for(i = 0; i < fd_max + 1; i++)
         {
-            if(FD_ISSET(i, &cpy_reads))
+            if(FD_ISSET(i, &cpy_reads)) // cpy_reads include changed fd
             {
                 if(i == serv_sock)
                 {
